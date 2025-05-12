@@ -184,7 +184,9 @@ filter_snv <- function(one_smpSNP, keepSNP, minDepth, mafRange) {
 ####Calculate peak statistics for whole chromosome####
 calc_chrom_lvl <- function(smpSNPdata.tmp) {
   smpSNPdata <- smpSNPdata.tmp %>% group_by(chr) %>% arrange(chr, desc(depth) ) %>%
-    mutate(snvOrd=1:n()) %>% filter(snvOrd<=1000) %>%
+    #mutate(snvOrd=1:n()) %>% 
+    mutate(snvOrd = row_number()) %>%
+    filter(snvOrd<=1000) %>%
     mutate(snvNum=n(), peak_max=densityMaxY(maf),
            peak=findPeak(maf), peakCol=ifelse(between(peak, 0.42, 0.58), 'black', 'red'), peakdist = find_peak_dist(maf)) %>%
    ungroup() %>% mutate(chr = factor(chr, levels = c(1:22, "X")))
@@ -600,7 +602,8 @@ get_arm_metr <- function(count_ns, smpSNPdata, sample_name, centr_ref) {
 calc_arm <- function(smpSNPdata.tmp) {
 
   smpSNPdata <- smpSNPdata.tmp %>% group_by(chr, arm) %>% arrange(chr, desc(depth) ) %>%
-    mutate(snvOrd=1:n()) %>%
+    #mutate(snvOrd=1:n()) %>%
+    mutate(snvOrd = row_number()) %>%
     mutate(snvNum=n(), peak_max=densityMaxY(maf),
            peak=findPeak(maf), peak_m_dist = abs(peak - 0.5), y_0.5 = find_y_0.5(maf), peakdist = find_peak_dist(maf), peakCol=ifelse(between(peak, 0.42, 0.58), 'black', 'red')) %>%
     ungroup() %>% filter(chr %in% c(1:22, "X")) %>% mutate(chr = factor(chr, levels = c(1:22, "X")))
